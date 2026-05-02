@@ -48,21 +48,21 @@
     .card-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
     .meta-chip { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--gray-600); background: var(--gray-100); padding: 4px 8px; border-radius: 6px; }
     .meta-chip svg { width: 12px; height: 12px; }
-    .price-row { display: flex; align-items: center; justify-content: space-between; padding-bottom: 12px; }
+    .price-row { padding-bottom: 12px; }
     .price { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; }
     .price span { font-size: 13px; font-weight: 400; color: var(--gray-400); }
     .card-btns { display: flex; gap: 8px; border-top: 1px solid var(--gray-100); padding-top: 12px; }
-    .card-btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 5px; background: #25d366; color: white; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; padding: 9px 8px; border-radius: 50px; text-decoration: none; transition: background 0.15s; text-align: center; }
+    .card-btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 5px; background: #25d366; color: white; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; padding: 9px 8px; border-radius: 50px; text-decoration: none; transition: background 0.15s; }
     .card-btn:hover { background: #1ebe5d; }
     .card-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
     .empty { grid-column: 1/-1; text-align: center; padding: 80px 24px; color: var(--gray-400); }
-    .empty svg { width: 48px; height: 48px; margin-bottom: 16px; opacity: 0.4; }
+    .empty svg { width: 48px; height: 48px; margin-bottom: 16px; opacity: 0.4; display: block; margin-left: auto; margin-right: auto; }
     .loading { grid-column: 1/-1; text-align: center; padding: 80px; color: var(--gray-400); }
     .spinner { width: 32px; height: 32px; border: 3px solid var(--gray-200); border-top-color: var(--blue); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 16px; }
     @keyframes spin { to { transform: rotate(360deg); } }
     .error-banner { background: #fff3cd; border: 1px solid #ffc107; color: #856404; padding: 14px 20px; border-radius: 8px; margin-bottom: 24px; font-size: 14px; display: none; }
     footer { text-align: center; padding: 24px; color: var(--gray-400); font-size: 13px; border-top: 1px solid var(--gray-200); background: var(--white); }
-    @media (max-width: 480px) { .header-btns { gap: 6px; } .wpp-btn { font-size: 12px; padding: 7px 10px; } }
+    @media (max-width: 480px) { .wpp-btn { font-size: 12px; padding: 7px 10px; } }
   </style>
 </head>
 <body>
@@ -106,7 +106,7 @@
 <footer>Catálogo3D — Todos os direitos reservados</footer>
 
 <script>
-  const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQgcFxqa0u9B8PA83sqOGbdKJesF3G5xE7XcE_bqwWFhjk03UXY1zWLxiJisIP6zsGoRKEZ0XVUZMUz/pub?gid=0&single=true&output=json&tq=';
+  const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQgcFxqa0u9B8PA83sqOGbdKJesF3G5xE7XcE_bqwWFhjk03UXY1zWLxiJisIP6zsGoRKEZ0XVUZMUz/pub?gid=0&single=true&output=csv';
   const CONTATOS = [
     { nome: 'Luciano', numero: '5554996747876' },
     { nome: 'Ariane',  numero: '5554994803710' },
@@ -117,8 +117,33 @@
   let produtos = [];
   let categoriaAtiva = 'todos';
 
+  function parseCSV(text) {
+    const lines = text.trim().split('\n');
+    return lines.slice(1).map(line => {
+      // handle commas inside quotes
+      const cols = [];
+      let cur = '', inQ = false;
+      for (let i = 0; i < line.length; i++) {
+        const c = line[i];
+        if (c === '"') { inQ = !inQ; }
+        else if (c === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
+        else { cur += c; }
+      }
+      cols.push(cur.trim());
+      return {
+        id:        cols[0] || '',
+        nome:      cols[1] || '',
+        filamento: cols[2] || '',
+        tempo:     cols[3] || '',
+        preco:     parseFloat(cols[4]) || 0,
+        categoria: cols[5] || 'Geral',
+        imagem:    cols[6] || '',
+      };
+    }).filter(p => p.nome);
+  }
+
   function wppLinks(p) {
-    const msg = `Olá! Tenho interesse no modelo:\n\n🖨️ *${p.nome}* (ID: ${p.id})\n💰 Valor: R$ ${Number(p.preco).toFixed(2)}\n\nPoderia me dar mais informações?`;
+    const msg = `Olá! Tenho interesse no modelo:\n\n🖨️ *${p.nome}* (ID: ${p.id})\n💰 Valor: R$ ${p.preco.toFixed(2)}\n\nPoderia me dar mais informações?`;
     return CONTATOS.map(c =>
       `<a href="https://wa.me/${c.numero}?text=${encodeURIComponent(msg)}" target="_blank" class="card-btn">${WPP_SVG} ${c.nome}</a>`
     ).join('');
@@ -127,25 +152,19 @@
   async function carregar() {
     const grid = document.getElementById('grid');
     try {
-      const res = await fetch(SHEET_URL);
+      const res = await fetch(CSV_URL);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
       const text = await res.text();
-      const json = JSON.parse(text.substring(47).slice(0, -2));
-      produtos = json.table.rows.map(row => ({
-        id: row.c[0]?.v ?? '',
-        nome: row.c[1]?.v ?? '',
-        filamento: row.c[2]?.v ?? '',
-        tempo: row.c[3]?.v ?? '',
-        preco: row.c[4]?.v ?? 0,
-        categoria: row.c[5]?.v ?? 'Geral',
-        imagem: row.c[6]?.v ?? '',
-      }));
+      produtos = parseCSV(text);
+      if (!produtos.length) throw new Error('vazio');
       buildFilters();
       render();
     } catch (e) {
       const b = document.getElementById('error-banner');
       b.style.display = 'block';
-      b.textContent = '⚠️ Não foi possível carregar o catálogo. Verifique a URL do Google Sheets.';
+      b.textContent = '⚠️ Não foi possível carregar o catálogo. Verifique se a planilha está publicada corretamente.';
       grid.innerHTML = `<div class="empty"><p>Erro ao carregar produtos.</p></div>`;
+      console.error(e);
     }
   }
 
@@ -187,7 +206,7 @@
             ${p.categoria ? `<div class="meta-chip">${p.categoria}</div>` : ''}
           </div>
           <div class="price-row">
-            <div class="price"><span>R$</span> ${Number(p.preco).toLocaleString('pt-BR',{minimumFractionDigits:2})}</div>
+            <div class="price"><span>R$</span> ${p.preco.toLocaleString('pt-BR',{minimumFractionDigits:2})}</div>
           </div>
           <div class="card-btns">${wppLinks(p)}</div>
         </div>
