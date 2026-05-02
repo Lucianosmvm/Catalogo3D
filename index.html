@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Catálogo 3D</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --blue: #1a6cf6; --blue-light: #e8f0fe; --blue-dark: #0f4bbf;
+      --gray-50: #f8f9fb; --gray-100: #f0f2f5; --gray-200: #e2e6ec;
+      --gray-400: #9aa3b0; --gray-600: #5a6478; --gray-900: #111827;
+      --white: #ffffff; --radius: 14px;
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--gray-50); color: var(--gray-900); min-height: 100vh; }
+    header { background: var(--white); border-bottom: 1px solid var(--gray-200); position: sticky; top: 0; z-index: 100; }
+    .header-inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; color: var(--blue); letter-spacing: -0.5px; text-decoration: none; white-space: nowrap; }
+    .logo span { color: var(--gray-900); }
+    .header-btns { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .wpp-btn { display: inline-flex; align-items: center; gap: 6px; background: #25d366; color: white; font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 13px; padding: 8px 14px; border-radius: 50px; text-decoration: none; transition: background 0.2s; white-space: nowrap; }
+    .wpp-btn:hover { background: #1ebe5d; }
+    .wpp-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .hero { background: linear-gradient(135deg, #0f1e3d 0%, #1a3a7a 60%, #1a6cf6 100%); padding: 64px 24px; text-align: center; position: relative; overflow: hidden; }
+    .hero::before { content: ''; position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E"); }
+    .hero h1 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: clamp(32px, 6vw, 56px); color: white; letter-spacing: -1px; line-height: 1.1; position: relative; }
+    .hero p { color: rgba(255,255,255,0.7); font-size: 17px; margin-top: 14px; position: relative; font-weight: 300; }
+    .search-bar { max-width: 480px; margin: 32px auto 0; position: relative; }
+    .search-bar input { width: 100%; padding: 14px 20px 14px 48px; border-radius: 50px; border: none; font-family: 'DM Sans', sans-serif; font-size: 15px; outline: none; background: white; box-shadow: 0 4px 24px rgba(0,0,0,0.2); }
+    .search-bar svg { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--gray-400); width: 20px; height: 20px; }
+    .main { max-width: 1200px; margin: 0 auto; padding: 40px 24px 80px; }
+    .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 32px; }
+    .filter-btn { background: var(--white); border: 1.5px solid var(--gray-200); color: var(--gray-600); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; padding: 7px 16px; border-radius: 50px; cursor: pointer; transition: all 0.15s; }
+    .filter-btn:hover { border-color: var(--blue); color: var(--blue); }
+    .filter-btn.active { background: var(--blue); border-color: var(--blue); color: white; }
+    .section-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 20px; margin-bottom: 20px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+    .card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--gray-200); overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; animation: fadeUp 0.4s ease both; }
+    .card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(26,108,246,0.12); }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .card-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; }
+    .card-img-placeholder { width: 100%; aspect-ratio: 1/1; background: linear-gradient(135deg, var(--gray-100), var(--blue-light)); display: flex; align-items: center; justify-content: center; }
+    .card-img-placeholder svg { width: 48px; height: 48px; color: var(--blue); opacity: 0.4; }
+    .card-body { padding: 16px; }
+    .card-id { font-size: 11px; font-weight: 600; color: var(--blue); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 4px; }
+    .card-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 16px; margin-bottom: 10px; line-height: 1.3; }
+    .card-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+    .meta-chip { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--gray-600); background: var(--gray-100); padding: 4px 8px; border-radius: 6px; }
+    .meta-chip svg { width: 12px; height: 12px; }
+    .price-row { display: flex; align-items: center; justify-content: space-between; padding-bottom: 12px; }
+    .price { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; }
+    .price span { font-size: 13px; font-weight: 400; color: var(--gray-400); }
+    .card-btns { display: flex; gap: 8px; border-top: 1px solid var(--gray-100); padding-top: 12px; }
+    .card-btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 5px; background: #25d366; color: white; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; padding: 9px 8px; border-radius: 50px; text-decoration: none; transition: background 0.15s; text-align: center; }
+    .card-btn:hover { background: #1ebe5d; }
+    .card-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
+    .empty { grid-column: 1/-1; text-align: center; padding: 80px 24px; color: var(--gray-400); }
+    .empty svg { width: 48px; height: 48px; margin-bottom: 16px; opacity: 0.4; }
+    .loading { grid-column: 1/-1; text-align: center; padding: 80px; color: var(--gray-400); }
+    .spinner { width: 32px; height: 32px; border: 3px solid var(--gray-200); border-top-color: var(--blue); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .error-banner { background: #fff3cd; border: 1px solid #ffc107; color: #856404; padding: 14px 20px; border-radius: 8px; margin-bottom: 24px; font-size: 14px; display: none; }
+    footer { text-align: center; padding: 24px; color: var(--gray-400); font-size: 13px; border-top: 1px solid var(--gray-200); background: var(--white); }
+    @media (max-width: 480px) { .header-btns { gap: 6px; } .wpp-btn { font-size: 12px; padding: 7px 10px; } }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="logo">Catálogo<span>3D</span></a>
+    <div class="header-btns">
+      <a href="https://wa.me/5554996747876" target="_blank" class="wpp-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Luciano
+      </a>
+      <a href="https://wa.me/5554994803710" target="_blank" class="wpp-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Ariane
+      </a>
+    </div>
+  </div>
+</header>
+
+<div class="hero">
+  <h1>Impressão 3D<br>sob medida</h1>
+  <p>Escolha seu modelo, veja o preço e peça pelo WhatsApp</p>
+  <div class="search-bar">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" id="search" placeholder="Buscar modelo..." />
+  </div>
+</div>
+
+<div class="main">
+  <div class="error-banner" id="error-banner"></div>
+  <div class="filters" id="filters">
+    <button class="filter-btn active" data-cat="todos">Todos</button>
+  </div>
+  <div class="section-title" id="count-label">Todos os modelos</div>
+  <div class="grid" id="grid">
+    <div class="loading"><div class="spinner"></div><p>Carregando catálogo...</p></div>
+  </div>
+</div>
+
+<footer>Catálogo3D — Todos os direitos reservados</footer>
+
+<script>
+  const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQgcFxqa0u9B8PA83sqOGbdKJesF3G5xE7XcE_bqwWFhjk03UXY1zWLxiJisIP6zsGoRKEZ0XVUZMUz/pub?gid=0&single=true&output=json&tq=';
+  const CONTATOS = [
+    { nome: 'Luciano', numero: '5554996747876' },
+    { nome: 'Ariane',  numero: '5554994803710' },
+  ];
+
+  const WPP_SVG = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>`;
+
+  let produtos = [];
+  let categoriaAtiva = 'todos';
+
+  function wppLinks(p) {
+    const msg = `Olá! Tenho interesse no modelo:\n\n🖨️ *${p.nome}* (ID: ${p.id})\n💰 Valor: R$ ${Number(p.preco).toFixed(2)}\n\nPoderia me dar mais informações?`;
+    return CONTATOS.map(c =>
+      `<a href="https://wa.me/${c.numero}?text=${encodeURIComponent(msg)}" target="_blank" class="card-btn">${WPP_SVG} ${c.nome}</a>`
+    ).join('');
+  }
+
+  async function carregar() {
+    const grid = document.getElementById('grid');
+    try {
+      const res = await fetch(SHEET_URL);
+      const text = await res.text();
+      const json = JSON.parse(text.substring(47).slice(0, -2));
+      produtos = json.table.rows.map(row => ({
+        id: row.c[0]?.v ?? '',
+        nome: row.c[1]?.v ?? '',
+        filamento: row.c[2]?.v ?? '',
+        tempo: row.c[3]?.v ?? '',
+        preco: row.c[4]?.v ?? 0,
+        categoria: row.c[5]?.v ?? 'Geral',
+        imagem: row.c[6]?.v ?? '',
+      }));
+      buildFilters();
+      render();
+    } catch (e) {
+      const b = document.getElementById('error-banner');
+      b.style.display = 'block';
+      b.textContent = '⚠️ Não foi possível carregar o catálogo. Verifique a URL do Google Sheets.';
+      grid.innerHTML = `<div class="empty"><p>Erro ao carregar produtos.</p></div>`;
+    }
+  }
+
+  function buildFilters() {
+    const cats = ['todos', ...new Set(produtos.map(p => p.categoria))];
+    const el = document.getElementById('filters');
+    el.innerHTML = cats.map(c => `<button class="filter-btn${c==='todos'?' active':''}" data-cat="${c}">${c==='todos'?'Todos':c}</button>`).join('');
+    el.querySelectorAll('.filter-btn').forEach(btn => btn.addEventListener('click', () => {
+      el.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      categoriaAtiva = btn.dataset.cat;
+      render();
+    }));
+  }
+
+  function render() {
+    const busca = document.getElementById('search').value.toLowerCase();
+    const lista = produtos.filter(p =>
+      (categoriaAtiva === 'todos' || p.categoria === categoriaAtiva) &&
+      (!busca || p.nome.toLowerCase().includes(busca) || String(p.id).toLowerCase().includes(busca))
+    );
+    document.getElementById('count-label').textContent = `${lista.length} modelo${lista.length!==1?'s':''} encontrado${lista.length!==1?'s':''}`;
+    const grid = document.getElementById('grid');
+    if (!lista.length) {
+      grid.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 15s1.5-2 4-2 4 2 4 2M9 9h.01M15 9h.01"/></svg><p>Nenhum modelo encontrado</p></div>`;
+      return;
+    }
+    grid.innerHTML = lista.map((p, i) => `
+      <div class="card" style="animation-delay:${i*0.04}s">
+        ${p.imagem
+          ? `<img class="card-img" src="${p.imagem}" alt="${p.nome}" loading="lazy" onerror="this.parentNode.querySelector('.card-img-placeholder').style.display='flex';this.remove()" /><div class="card-img-placeholder" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6.429 9.75L2.25 12l4.179 2.25m0-4.5l5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0l4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0l-5.571 3-5.571-3"/></svg></div>`
+          : `<div class="card-img-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6.429 9.75L2.25 12l4.179 2.25m0-4.5l5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0l4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0l-5.571 3-5.571-3"/></svg></div>`}
+        <div class="card-body">
+          <div class="card-id">#${p.id}</div>
+          <div class="card-name">${p.nome}</div>
+          <div class="card-meta">
+            ${p.filamento ? `<div class="meta-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>${p.filamento}g de filamento</div>` : ''}
+            ${p.tempo ? `<div class="meta-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>${p.tempo}h de impressão</div>` : ''}
+            ${p.categoria ? `<div class="meta-chip">${p.categoria}</div>` : ''}
+          </div>
+          <div class="price-row">
+            <div class="price"><span>R$</span> ${Number(p.preco).toLocaleString('pt-BR',{minimumFractionDigits:2})}</div>
+          </div>
+          <div class="card-btns">${wppLinks(p)}</div>
+        </div>
+      </div>`).join('');
+  }
+
+  document.getElementById('search').addEventListener('input', render);
+  carregar();
+</script>
+</body>
+</html>
