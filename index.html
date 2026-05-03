@@ -128,11 +128,12 @@
       return {
         id:        cols[0] || '',
         nome:      cols[1] || '',
-        filamento: cols[2] || '',
-        tempo:     cols[3] || '',
-        preco:     parseFloat(cols[4]) || 0,
-        categoria: cols[5] || 'Geral',
-        imagem:    cols[6] || '',
+        cor:       cols[2] || '',
+        material:  cols[3] || '',
+        tamanho:   cols[4] || '',
+        preco:     parseFloat(cols[5]) || 0,
+        categoria: cols[6] || 'Geral',
+        imagem:    cols[7] || '',
       };
     }).filter(p => p.nome);
   }
@@ -196,8 +197,9 @@
           <div class="card-id">#${p.id}</div>
           <div class="card-name">${p.nome}</div>
           <div class="card-meta">
-            ${p.filamento ? `<div class="meta-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>${p.filamento}g de filamento</div>` : ''}
-            ${p.tempo ? `<div class="meta-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>${p.tempo}h de impressão</div>` : ''}
+            ${p.cor ? `<div class="meta-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 000 20"/></svg>${p.cor}</div>` : ''}
+            ${p.material ? `<div class="meta-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>${p.material}</div>` : ''}
+            ${p.tamanho ? `<div class="meta-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>${p.tamanho}</div>` : ''}
             ${p.categoria ? `<div class="meta-chip">${p.categoria}</div>` : ''}
           </div>
           <div class="price-row">
